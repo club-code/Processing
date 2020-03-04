@@ -6,14 +6,14 @@ class NGram(private val order: Int) {
     private val sequences = HashMap<String, ArrayList<String>>()
     private val beginnings = mutableSetOf<Array<String>>()
 
-    fun apply(input: String){
-        val wordsResults = Regex("[\\wâÀàéêèçîûùÔô\\-'’]+|,|;|\\.{2,3}|\\.|!|\\?|:").findAll(input).map { it.value }.toList()
+    fun apply(input: String, point: Boolean = true){
+        val wordsResults = Regex("[\\wâÀàéêèçîûùÔô\\-'’]+|,|;|\\.{2,3}|M\\.|\\.|!|\\?|:").findAll(input).map { it.value }.toList()
         for(i in wordsResults.indices){
             val word = concat(wordsResults, i, order)
             val nextWords = sequences[arrayToString(word)]
             if(i == 0 || wordsResults[i-1] == ".")
                 beginnings.add(word)
-            if(word[word.size-1] != ".") {
+            if(!point || word[word.size-1] != ".") {
                 if (nextWords != null) {
                     if (i + order in wordsResults.indices)
                         nextWords.add(wordsResults[i + order])
@@ -37,6 +37,7 @@ class NGram(private val order: Int) {
             if(next !in listOf(",", "."))
                 result.append(' ')
             if(next == null) {
+                println(arrayToString(current))
                 //result.append('#')
                 result.append(generate(min - size))
                 size = min
@@ -56,28 +57,28 @@ class NGram(private val order: Int) {
     override fun toString(): String{
         val res = StringBuilder()
         res.append(sequences.toString()+"\n")
-        for(i in beginnings){
+        /*for(i in beginnings){
             for(j in i){
                 res.append("$j ")
             }
             res.append("\n")
-        }
+        }*/
         return res.toString()
     }
 }
 
-fun concat(list: List<String>,i: Int, n: Int): Array<String>{
+fun concat(list: List<String>,i: Int, n: Int, point: Boolean = true): Array<String>{
 
     val result = Array(n){""}
     result[0] = list[i]
-    if(list[i] == ".")
+    if(point && list[i] == ".")
         return result
     for(j in 1 until n){
         if(j+i !in list.indices)
             break
         result[j] = list[j+i]
 
-        if(list[j+i] == "."){
+        if(point && list[j+i] == "."){
             break
         }
 
@@ -119,7 +120,7 @@ fun main(){
 
     val ngram = NGram(order)
     fileContent?.split("\n")?.forEach{
-        ngram.apply(it)
+        ngram.apply(it, true)
     }
     print("minimum words per blocks(30): ")
     val min = stringToInt(readLine() ?: "", 30)
@@ -129,4 +130,5 @@ fun main(){
     println("\n")
     for(i in 0 until nb)
         println(ngram.generate(min))
+    //println(ngram.toString())
 }
