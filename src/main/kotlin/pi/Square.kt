@@ -3,6 +3,7 @@ package pi
 import circlePacking.CirclePacking
 import processing.core.*
 import processing.core.PApplet
+import java.lang.StringBuilder
 import kotlin.math.pow
 
 
@@ -33,9 +34,9 @@ class SquarePacking : PApplet(){
     val squares = listOf(Square(250.0, 0.0, 10.0), Square(500.0, -5.0/timeSteps, 100.0, 100.0.pow(digits-1)))
     var count = 0
 
-    data class Truc(val a: String){
+    inner class Truc(val a: String){
         fun b(){
-
+            this@SquarePacking.rect(1f,1f,1f,1f)
         }
     }
 
@@ -94,5 +95,16 @@ class SquarePacking : PApplet(){
 }
 
 fun main(args: Array<String>) {
+//    val a = arrayOf("alex", "truc", "yacine ce connard", "paul est meilleur en RA")
+//    println(a.str())
     SquarePacking.run()
 }
+
+//fun <T> Array<T>.str(): String {
+//    val res = StringBuilder("Array[")
+//    for(i in this){
+//        res.append("$i, ")
+//    }
+//    res.append("]")
+//    return res.toString()
+//}
