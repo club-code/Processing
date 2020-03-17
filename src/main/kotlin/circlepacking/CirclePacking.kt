@@ -1,4 +1,4 @@
-package circlePacking
+package circlepacking
 
 import processing.core.PApplet
 import processing.core.PConstants

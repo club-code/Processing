@@ -1,6 +1,6 @@
 package pi
 
-import circlePacking.CirclePacking
+import circlepacking.CirclePacking
 import processing.core.*
 import processing.core.PApplet
 import java.lang.StringBuilder

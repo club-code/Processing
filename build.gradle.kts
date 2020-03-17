@@ -28,7 +28,7 @@ tasks {
     }
     jar {
         manifest {
-            attributes("Main-Class" to "textGenerator.TextGeneratorKt")
+            attributes("Main-Class" to "cherrytree.CherryTreeKt")
         }
         from(Callable { configurations["runtimeClasspath"].map { if (it.isDirectory) it else zipTree(it) } })    }
 }

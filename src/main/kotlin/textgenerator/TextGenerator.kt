@@ -1,4 +1,4 @@
-package textGenerator
+package textgenerator
 
 import java.io.File
 
