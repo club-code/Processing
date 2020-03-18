@@ -39,82 +39,83 @@ const val NO_SPLITTING_PROBA = 0.1
 class Program : PApplet() {
     lateinit var root: Tree
 
-    inner class Tree(private val truncLength: Float, private val truncWidth: Float, private val orientationDifference: Float, orientationMax: Float){
+    inner class Tree(private val truncLength: Float, private val truncWidth: Float,
+                     private val orientationDifference: Float, private val orientationMax: Float) {
         private var left: Tree? = null
         private var right: Tree? = null
-        private val trunc = Trunc(truncLength, truncWidth, orientationDifference)
-
+        private val trunc = Trunc(this.truncLength, this.truncWidth, this.orientationDifference)
 
         init {
-            if(truncLength > STOP_LENGTH) {
-
+            if (this.truncLength > STOP_LENGTH) {
                 val noSplitting = random(1f) <= NO_SPLITTING_PROBA
                 val coinToss = random(1f) <= 0.5f
 
                 if (noSplitting && coinToss || !noSplitting) {
-                    left = Tree(
-                        truncLength * random(TRUNC_LENGTH_DECREASE_MIN, TRUNC_LENGTH_DECREASE_MAX),
-                        truncWidth * random(TRUNC_WIDTH_DECREASE_MIN, TRUNC_WIDTH_DECREASE_MAX),
-                        -random(-orientationMax/10, orientationMax),
-                        orientationMax * random(ORIENTATION_DECREASE_MIN, ORIENTATION_DECREASE_MAX)
+                    this.left = Tree(
+                        this.truncLength * random(TRUNC_LENGTH_DECREASE_MIN, TRUNC_LENGTH_DECREASE_MAX),
+                        this.truncWidth * random(TRUNC_WIDTH_DECREASE_MIN, TRUNC_WIDTH_DECREASE_MAX),
+                        -random(-this.orientationMax / 10, this.orientationMax),
+                        this.orientationMax * random(ORIENTATION_DECREASE_MIN, ORIENTATION_DECREASE_MAX)
                     )
                 }
 
                 if (noSplitting && !coinToss || !noSplitting) {
-                    right = Tree(
-                        truncLength * random(TRUNC_LENGTH_DECREASE_MIN, TRUNC_LENGTH_DECREASE_MAX),
-                        truncWidth * random(TRUNC_WIDTH_DECREASE_MIN, TRUNC_WIDTH_DECREASE_MAX),
-                        random(-orientationMax/10, orientationMax),
-                        orientationMax * random(ORIENTATION_DECREASE_MIN, ORIENTATION_DECREASE_MAX)
+                    this.right = Tree(
+                        this.truncLength * random(TRUNC_LENGTH_DECREASE_MIN, TRUNC_LENGTH_DECREASE_MAX),
+                        this.truncWidth * random(TRUNC_WIDTH_DECREASE_MIN, TRUNC_WIDTH_DECREASE_MAX),
+                        random(-this.orientationMax / 10, this.orientationMax),
+                        this.orientationMax * random(ORIENTATION_DECREASE_MIN, ORIENTATION_DECREASE_MAX)
                     )
                 }
             }
         }
 
-        fun noOscillation() {
+        fun noBaseOscillation() {
             this.trunc.noOscillation()
         }
 
-        fun draw(t: Int, position: PVector, orientation: Float){
-            val (end, newOrientation) = trunc.draw(t, position, orientation)
+        fun draw(t: Int, position: PVector, orientation: Float) {
+            val (end, newOrientation) = this.trunc.draw(t, position, orientation)
 
-            if (truncLength > STOP_LENGTH) {
-                left?.draw(t, end, newOrientation)
-                right?.draw(t, end, newOrientation)
+            if (this.truncLength > STOP_LENGTH) {
+                this.left?.draw(t, end, newOrientation)
+                this.right?.draw(t, end, newOrientation)
             } else {
                 strokeWeight(0f)
                 fill(250f, 80f, 120f, 120f)
-                ellipse(end.x, end.y, 20f,20f)
+                ellipse(end.x, end.y, 20f, 20f)
             }
         }
     }
 
 
-    inner class Trunc(val length: Float, val width: Float, val orientationDifference: Float){
+    inner class Trunc(private val length: Float, private val width: Float, private val orientationDifference: Float) {
         private val truncSteps: MutableList<TruncStep> = mutableListOf()
         private val phase: Float = random(PHASE_MIN, PHASE_MAX)
         private var oscillationAmplitude = random(radians(OSCILLATION_AMPLITUDE_MAX))
-        private val frequency = random(FREQ_MIN, FREQ_MAX) / log(1 + width * FREQ_WEIGHT_COMPRESSION)
+        private val frequency = random(FREQ_MIN, FREQ_MAX) / log(1 + this.width * FREQ_WEIGHT_COMPRESSION)
 
         init {
             var sum = 0f
 
-            while (sum < length){
+            while (sum < this.length) {
                 val l = random(TRUNC_STEP_LENGTH_MIN, TRUNC_STEP_LENGTH_MAX)
-                truncSteps.add(TruncStep(l, width, radians(random(TRUNC_STEP_ORIENTATION_DIFF_MIN, TRUNC_STEP_ORIENTATION_DIFF_MAX))))
+                this.truncSteps.add(TruncStep(l, this.width, radians(random(TRUNC_STEP_ORIENTATION_DIFF_MIN,
+                                                                            TRUNC_STEP_ORIENTATION_DIFF_MAX))))
                 sum += l
             }
         }
 
-        fun noOscillation(){
-            oscillationAmplitude = 0f
+        fun noOscillation() {
+            this.oscillationAmplitude = 0f
         }
 
-        fun draw(t: Int, position: PVector, orientation: Float): Pair<PVector, Float>{
+        fun draw(t: Int, position: PVector, orientation: Float): Pair<PVector, Float> {
             var end: PVector = position
-            var stepOrientation = orientation + orientationDifference + oscillationAmplitude * sin(frequency*t + phase)
+            var stepOrientation = (orientation + this.orientationDifference
+                                   + this.oscillationAmplitude * sin(this.frequency * t + this.phase))
 
-            for(step in truncSteps){
+            for (step in this.truncSteps) {
                 val pair = step.draw(end, stepOrientation)
                 end = pair.first
                 stepOrientation = pair.second
@@ -122,17 +123,17 @@ class Program : PApplet() {
 
             return end to stepOrientation
         }
-
     }
 
-    inner class TruncStep(val length: Float, val width:Float, val orientationDifference: Float){
-        fun draw(position: PVector, orientation: Float): Pair<PVector, Float>{
-            val newOrientation = orientation + orientationDifference
-            val end = PVector.add(position, PVector
-                .fromAngle(newOrientation)
-                .mult(length))
-            strokeWeight(width)
+
+    inner class TruncStep(private val length: Float, private val width: Float, private val orientationDifference: Float) {
+        fun draw(position: PVector, orientation: Float): Pair<PVector, Float> {
+            val newOrientation = orientation + this.orientationDifference
+            val end = PVector.add(position, PVector.fromAngle(newOrientation).mult(this.length))
+ 
+            strokeWeight(this.width)
             line(position.x, position.y, end.x, end.y)
+
             return end to newOrientation
         }
     }
@@ -145,33 +146,36 @@ class Program : PApplet() {
     override fun setup() {
         frameRate(30f)
 
+        ellipseMode(CENTER)
         strokeCap(ROUND)
+
         background(230f, 250f, 220f)
         stroke(80f, 0f, 50f, 200f)
-        ellipseMode(CENTER)
-//        Trunc(100f,20f, radians(random(INIT_ORIENTATION_DIFF_MIN, INIT_ORIENTATION_DIFF_MAX))).draw(0, PVector(width.toFloat() / 2, height.toFloat()), radians(-90f))
+
         this.mouseClicked()
     }
 
     override fun mouseClicked() {
-        root = Tree(random(100f, 120f), 30f, radians(random(INIT_ORIENTATION_DIFF_MIN, INIT_ORIENTATION_DIFF_MAX)), radians(45f))
-        root.noOscillation()
+        this.root = Tree(random(100f, 120f), 30f,
+                         radians(random(INIT_ORIENTATION_DIFF_MIN,
+                                        INIT_ORIENTATION_DIFF_MAX)),
+                         radians(45f))
+        this.root.noBaseOscillation()
     }
 
     override fun draw() {
         fill(230f, 250f, 220f, MOTION_BLUR_ALPHA_FACTOR)
-        rect(0f,0f, width.toFloat(), height.toFloat())
-        root.draw(frameCount, PVector(width.toFloat() / 2, height.toFloat()), radians(-90f))
+        rect(0f, 0f, width.toFloat(), height.toFloat())
+        this.root.draw(frameCount, PVector(width.toFloat() / 2, height.toFloat()), radians(-90f))
     }
 
-    fun run(){
+    fun run() {
         runSketch()
     }
 }
 
 
-fun main(){
-    val program = Program()
-    program.run()
+fun main() {
+    Program().run()
 }
 
