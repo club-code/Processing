@@ -1,14 +1,18 @@
 package cherrytree
 
 import processing.core.PApplet
-import processing.core.PConstants
 import processing.core.PVector
 
 
 const val MOTION_BLUR_ALPHA_FACTOR = 150f
 const val STOP_LENGTH = 25.0f
+const val NO_SPLITTING_PROBA = 0.1
+const val SYM_MAX_ORIENTATION_FACTOR = 10f
 const val OSCILLATION_AMPLITUDE_MAX = 3.0f
 const val FREQ_WEIGHT_COMPRESSION = 1f
+
+const val LEAVES_RADIUS_MIN = 10f
+const val LEAVES_RADIUS_MAX = 20f
 
 const val FREQ_MIN = 0.02f
 const val FREQ_MAX = 0.1f
@@ -24,26 +28,36 @@ const val TRUNC_LENGTH_DECREASE_MAX = 0.9f
 
 const val TRUNC_STEP_LENGTH_MIN = 10f
 const val TRUNC_STEP_LENGTH_MAX = 20f
+
 const val TRUNC_STEP_ORIENTATION_DIFF_MIN = -15f
 const val TRUNC_STEP_ORIENTATION_DIFF_MAX = 15f
-
-const val INIT_ORIENTATION_DIFF_MIN = -20f
-const val INIT_ORIENTATION_DIFF_MAX = 20f
 
 const val ORIENTATION_DECREASE_MIN = 0.8f
 const val ORIENTATION_DECREASE_MAX = 1.2f
 
-const val NO_SPLITTING_PROBA = 0.1
+const val INIT_ORIENTATION_DIFF_MIN = -20f
+const val INIT_ORIENTATION_DIFF_MAX = 20f
+
+const val INIT_TRUNC_LENGTH_MIN = 100f
+const val INIT_TRUNC_LENGTH_MAX = 120f
+
+const val INIT_TRUNC_WIDTH_MIN = 20f
+const val INIT_TRUNC_WIDTH_MAX = 40f
+
+const val INIT_MAX_ORIENTATION_MIN = 30f
+const val INIT_MAX_ORIENTATION_MAX = 50f
+
 
 
 class Program : PApplet() {
     lateinit var root: Tree
 
-    inner class Tree(private val truncLength: Float, private val truncWidth: Float,
-                     private val orientationDifference: Float, private val orientationMax: Float) {
+    inner class Tree(private val truncLength: Float,            private val truncWidth: Float,
+                     private val orientationDifference: Float,  private val orientationMax: Float) {
         private var left: Tree? = null
         private var right: Tree? = null
         private val trunc = Trunc(this.truncLength, this.truncWidth, this.orientationDifference)
+        private var leafRadius = 0f
 
         init {
             if (this.truncLength > STOP_LENGTH) {
@@ -54,7 +68,7 @@ class Program : PApplet() {
                     this.left = Tree(
                         this.truncLength * random(TRUNC_LENGTH_DECREASE_MIN, TRUNC_LENGTH_DECREASE_MAX),
                         this.truncWidth * random(TRUNC_WIDTH_DECREASE_MIN, TRUNC_WIDTH_DECREASE_MAX),
-                        -random(-this.orientationMax / 10, this.orientationMax),
+                        -random(-this.orientationMax / SYM_MAX_ORIENTATION_FACTOR, this.orientationMax),
                         this.orientationMax * random(ORIENTATION_DECREASE_MIN, ORIENTATION_DECREASE_MAX)
                     )
                 }
@@ -63,10 +77,12 @@ class Program : PApplet() {
                     this.right = Tree(
                         this.truncLength * random(TRUNC_LENGTH_DECREASE_MIN, TRUNC_LENGTH_DECREASE_MAX),
                         this.truncWidth * random(TRUNC_WIDTH_DECREASE_MIN, TRUNC_WIDTH_DECREASE_MAX),
-                        random(-this.orientationMax / 10, this.orientationMax),
+                        random(-this.orientationMax / SYM_MAX_ORIENTATION_FACTOR, this.orientationMax),
                         this.orientationMax * random(ORIENTATION_DECREASE_MIN, ORIENTATION_DECREASE_MAX)
                     )
                 }
+            } else {
+                this.leafRadius = random(LEAVES_RADIUS_MIN, LEAVES_RADIUS_MAX)
             }
         }
 
@@ -83,7 +99,7 @@ class Program : PApplet() {
             } else {
                 strokeWeight(0f)
                 fill(250f, 80f, 120f, 120f)
-                ellipse(end.x, end.y, 20f, 20f)
+                ellipse(end.x, end.y, this.leafRadius, this.leafRadius)
             }
         }
     }
@@ -156,10 +172,14 @@ class Program : PApplet() {
     }
 
     override fun mouseClicked() {
-        this.root = Tree(random(100f, 120f), 30f,
+        this.root = Tree(random(INIT_TRUNC_LENGTH_MIN,
+                                INIT_TRUNC_LENGTH_MAX),
+                         random(INIT_TRUNC_WIDTH_MIN,
+                                INIT_TRUNC_WIDTH_MAX),
                          radians(random(INIT_ORIENTATION_DIFF_MIN,
                                         INIT_ORIENTATION_DIFF_MAX)),
-                         radians(45f))
+                         radians(random(INIT_MAX_ORIENTATION_MIN,
+                                        INIT_MAX_ORIENTATION_MAX)))
         this.root.noBaseOscillation()
     }
 
