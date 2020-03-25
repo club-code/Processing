@@ -170,9 +170,9 @@ class CalculatedLayer(nodeCount: Int): Layer<CalculatedNode>() {
     }
 
     fun compute() {
-//        valuesMatrix = ( weightsMatrix dot (feedingLayer.toMatrix({it.value})) ).mapToBuffer {
-//            sigmoid(it)
-//        }.as2D()
+        valuesMatrix = ( weightsMatrix dot (feedingLayer.toMatrix({it.value})) ).mapToBuffer {
+            sigmoid(it)
+        }.as2D()
     }
 }
 
