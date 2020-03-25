@@ -1,2 +1,2 @@
-rootProject.name = "Processing"
+rootProject.name = "MiniProjets"
 

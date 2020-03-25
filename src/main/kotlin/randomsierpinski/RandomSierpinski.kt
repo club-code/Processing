@@ -15,6 +15,7 @@ const val capacity = 100
 class Program : PApplet() {
     val points = ArrayBlockingQueue<PVector>(capacity)
     var job: Job? = null
+
     lateinit var start: PVector
 
     lateinit var triangle: Triangle
@@ -46,7 +47,7 @@ class Program : PApplet() {
     override fun mouseClicked() {
         job?.cancel()
         points.clear()
-        triangle = Triangle(
+        triangle = Triangle (
             PVector(random(1500f),random( 800f)),
             PVector(random(1500f),random( 800f)),
             PVector(random(1500f),random( 800f))
@@ -70,7 +71,6 @@ class Program : PApplet() {
         repeat(capacity) {
             val point = points.take()
             ellipse(point.x, point.y, 1f, 1f)
-
         }
     }
 

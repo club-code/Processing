@@ -9,6 +9,7 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://dl.bintray.com/mipt-npm/scientifik")
 }
 
 dependencies {
@@ -16,6 +17,7 @@ dependencies {
     testImplementation("junit", "junit", "4.12")
     implementation("org.processing:core:3.3.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
+    api("scientifik:kmath-core:0.1.3")
 }
 
 configure<JavaPluginConvention> {
@@ -23,7 +25,7 @@ configure<JavaPluginConvention> {
 }
 
 application {
-    mainClassName = "cherrytree.CherryTreeKt"
+    mainClassName = "LauncherKt"
 }
 
 tasks {
@@ -35,7 +37,7 @@ tasks {
     }
     jar {
         manifest {
-            attributes("Main-Class" to "cherrytree.CherryTreeKt")
+            attributes("Main-Class" to "LauncherKt")
         }
         from(Callable { configurations["runtimeClasspath"].map { if (it.isDirectory) it else zipTree(it) } })
     }
