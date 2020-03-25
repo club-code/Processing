@@ -15,3 +15,10 @@
 #### Autres
 - TextGenerator : chaine de markov qui permet de générer des textes à partir d'autres (Bovary...)
 - 
+
+
+## Installation
+
+Une fois le projet cloné, lancez la commande
+`./gradlew jar` sur linux
+ou ` ./gradlew.bat jar` sur windows
