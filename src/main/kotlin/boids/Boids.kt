@@ -3,12 +3,17 @@ package boids
 import processing.core.PApplet
 import processing.core.PVector
 
+const val MASS = 1
+
 const val FORCE_MAX = 0.2f
 const val SPEED_MAX = 5f
 const val ALIGN = 1.5f
 const val COHESION = 1f
 const val SEPARATION = 2f
 const val SIZE = 50
+const val RADIUS_SEPARATION = 100f
+const val RADIUS_ALIGN = 150f
+const val RADIUS_COHESION = 200f
 
 class Program: PApplet() {
 
@@ -19,7 +24,7 @@ class Program: PApplet() {
         private val vel: PVector = PVector.random2D(),
         private val acc: PVector = PVector()
     ){
-        fun edges() {
+        private fun edges() {
             if (pos.x > width) {
                 pos.x = 0f
             } else if (pos.x < 0) {
@@ -32,73 +37,65 @@ class Program: PApplet() {
             }
         }
 
-        fun align(boids: Collection<Boid>): PVector{
-            val perceptionRadius = 110f
-            val steering = PVector()
-            var total = 0f
-            for (other in boids) {
-                val d = distanceFlatTorus(pos.x, pos.y, other.pos.x, other.pos.y)
-                if (other != this && d < perceptionRadius) {
+        private fun align(): PVector{
+            return averageNeighbours(
+                RADIUS_ALIGN,
+                { steering, other, _ ->
                     steering.add(other.vel)
-                    total++
+                },
+                { steering, total ->
+                    if (total > 0) {
+                        steering.div(total)
+                        steering.setMag(SPEED_MAX*MASS)
+                        steering.sub(vel)
+                        steering.limit(FORCE_MAX)
+                    }
                 }
-            }
-            if (total > 0) {
-                steering.div(total)
-                steering.setMag(SPEED_MAX)
-                steering.sub(vel)
-                steering.limit(FORCE_MAX)
-            }
-            return steering
+            )
         }
 
-        fun separation(boids: Collection<Boid>): PVector{
-            val perceptionRadius = 100f
-            val steering = PVector()
-            var total = 0f
-            for (other in boids) {
-                val d = distanceFlatTorus(pos.x, pos.y, other.pos.x, other.pos.y)
-                if (other != this && d < perceptionRadius) {
+
+        private fun separation(): PVector{
+            return averageNeighbours(
+                RADIUS_SEPARATION,
+                { steering, other, d ->
                     val diff = PVector.sub(pos, other.pos)
                     diff.div(d * d)
                     steering.add(diff)
-                    total++
+                },
+                { steering, total ->
+                    if (total > 0) {
+                        steering.div(total)
+                        steering.setMag(SPEED_MAX*MASS)
+                        steering.sub(vel)
+                        steering.limit(FORCE_MAX)
+                    }
                 }
-            }
-            if (total > 0) {
-                steering.div(total)
-                steering.setMag(SPEED_MAX)
-                steering.sub(vel)
-                steering.limit(FORCE_MAX)
-            }
-            return steering
+            )
         }
 
-        fun cohesion(boids: Collection<Boid>): PVector{
-            val perceptionRadius = 200f
-            val steering = PVector()
-            var total = 0f
-            for (other in boids) {
-                val d = distanceFlatTorus(pos.x, pos.y, other.pos.x, other.pos.y)
-                if (other != this && d < perceptionRadius) {
+        private fun cohesion(): PVector{
+            return averageNeighbours(
+                RADIUS_COHESION,
+                { steering, other, _ ->
                     steering.add(other.pos)
-                    total++
+                },
+                { steering, total ->
+                    if (total > 0) {
+                        steering.div(total)
+                        steering.sub(pos)
+                        steering.setMag(SPEED_MAX*MASS)
+                        steering.sub(vel)
+                        steering.limit(FORCE_MAX)
+                    }
                 }
-            }
-            if (total > 0) {
-                steering.div(total)
-                steering.sub(pos)
-                steering.setMag(SPEED_MAX)
-                steering.sub(vel)
-                steering.limit(FORCE_MAX)
-            }
-            return steering
+            )
         }
 
-        fun flock(boids: Collection<Boid>){
-            val alignment = align(boids)
-            val cohesion = cohesion(boids)
-            val separation = separation(boids)
+        fun flock(){
+            val alignment = align()
+            val cohesion = cohesion()
+            val separation = separation()
 
             alignment.mult(ALIGN)
             cohesion.mult(COHESION)
@@ -107,6 +104,26 @@ class Program: PApplet() {
             acc.add(alignment)
             acc.add(cohesion)
             acc.add(separation)
+        }
+
+        private fun averageNeighbours(
+            radius: Float,
+            operation: (PVector, Boid, Float) -> Unit,
+            steeringOp: (PVector, Float)-> Unit
+        ): PVector{
+            val steering = PVector()
+            var total = 0f
+            for (other in boids) {
+                val d = distanceFlatTorus(pos.x, pos.y, other.pos.x, other.pos.y)
+                if (other != this && d < radius) {
+                    operation(steering, other, d)
+                    total++
+                }
+            }
+            if (total > 0) {
+                steeringOp(steering, total)
+            }
+            return steering
         }
 
         fun update(){
@@ -136,7 +153,7 @@ class Program: PApplet() {
          * Warning: in the paper, he swapped x2 and y1
          * @link https://www.researchgate.net/publication/327930363_Packing_of_Circles_on_Square_Flat_Torus_as_Global_Optimization_of_Mixed_Integer_Nonlinear_problem#pf1
          */
-        fun distanceFlatTorus(x1: Float, y1: Float, x2: Float, y2: Float): Float =
+        private fun distanceFlatTorus(x1: Float, y1: Float, x2: Float, y2: Float): Float =
             sqrt(pow(min(abs(x1-x2), width-abs(x1-x2)), 2f) + pow(min(abs(y1-y2), height-abs(y1-y2)), 2f))
     }
 
@@ -153,7 +170,7 @@ class Program: PApplet() {
     override fun draw(){
         background(0)
         for(boid in boids){
-            boid.flock(boids)
+            boid.flock()
             boid.update()
             boid.show()
         }
