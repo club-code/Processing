@@ -2,23 +2,29 @@ package boids
 
 import processing.core.PApplet
 import processing.core.PVector
+import kotlin.math.pow
 
 const val MASS = 1
 
 const val FORCE_MAX = 0.2f
 const val SPEED_MAX = 5f
+
 const val ALIGN = 1.5f
 const val COHESION = 1f
 const val SEPARATION = 2f
+const val AVOIDANCE = 1f
+
 const val SIZE = 50
+
 const val RADIUS_SEPARATION = 100f
 const val RADIUS_ALIGN = 150f
 const val RADIUS_COHESION = 200f
+const val RADIUS_AVOIDANCE = 400f
 
 class Program: PApplet() {
 
     private lateinit var boids: Collection<Boid>
-    private lateinit var obstacles: Collection<Pair<PVector,PVector>>
+    private lateinit var obstacles: Collection<Pair<PVector,Float>>
 
     inner class Boid(
         private val pos: PVector = PVector(random(width.toFloat()), random(height.toFloat())),
@@ -93,52 +99,72 @@ class Program: PApplet() {
             )
         }
 
-//        private fun findMostThreateningObstacle(): Pair<PVector, PVector> {
-//            var mostThreatening: Pair<PVector, PVector>? = null
-//
-//            for (obs in obstacles) {
-//                val collision = lineIntersecsCircle(ahead, ahead2, obs)
-//
-//                // "position" is the character's current position
-//                if (collision && (mostThreatening == null || distance(position, obstacle) < distance(position, mostThreatening))) {
-//                    mostThreatening = obstacle;
-//                }
-//            }
-//            return mostThreatening;
-//        }
+        private fun lineIntersecsCircle(start: PVector, end: PVector, center: PVector, radius: Float): Boolean{
+            val endX = end.x-center.x
+            val startX = start.x-center.x
+            val endY = end.y-center.y
+            val startY = start.y-center.y
+            return radius.pow(2)*((endX-startX).pow(2)+(endY-startY).pow(2))-(startX*endY-endX*startY) >= 0
+        }
 
-//        private fun avoidance(): PVector {
-//            ahead = ...; // calculate the ahead vector
-//            ahead2 = ...; // calculate the ahead2 vector
-//
-//            val mostThreatening  = findMostThreateningObstacle()
-//            val avoidance = PVector()
-//
-//            if (mostThreatening != null) {
-//                avoidance.x = ahead.x - mostThreatening.center.x;
-//                avoidance.y = ahead.y - mostThreatening.center.y;
-//
-//                avoidance.normalize();
-//                avoidance.mult(FORCE_MAX);
-//            } else {
-//                avoidance.mult(0)
-//            }
-//
-//            return avoidance;
-//        }
+        private fun findMostThreateningObstacle(ahead: PVector): Pair<PVector, Float>? {
+            var mostThreatening: Pair<PVector, Float>? = null
+
+            for (obs in obstacles) {
+                val collision = lineIntersecsCircle(pos, ahead, obs.first, obs.second)
+
+                // "position" is the character's current position
+                if (collision && (mostThreatening == null ||
+                            distanceFlatTorus(pos.x, pos.y, obs.first.x, obs.first.y) <
+                                distanceFlatTorus(pos.x, pos.y, mostThreatening.first.x, mostThreatening.first.y))) {
+                    mostThreatening = obs
+                }
+            }
+            return mostThreatening
+        }
+
+        private fun avoidance(): PVector {
+            val ahead = PVector.add(pos, PVector.mult(vel, 3f))
+
+            val mostThreatening  = findMostThreateningObstacle(ahead)
+            val avoidance = PVector()
+
+            if (mostThreatening != null) {
+                val d = distanceFlatTorus(pos.x, pos.y, mostThreatening.first.x, mostThreatening.first.y)
+                if(d < RADIUS_AVOIDANCE) {
+                    avoidance.x = ahead.x - mostThreatening.first.x
+                    avoidance.y = ahead.y - mostThreatening.first.y
+                    //val mag = avoidance.mag()
+                    avoidance.normalize()
+                    avoidance.mult(FORCE_MAX)
+                    if(d < mostThreatening.second){
+                        avoidance.mult(2f)
+                    }
+                } else {
+                    avoidance.mult(0f)
+                }
+            } else {
+                avoidance.mult(0f)
+            }
+
+            return avoidance
+        }
 
         fun flock(){
             val alignment = align()
             val cohesion = cohesion()
             val separation = separation()
+            val avoidance = avoidance()
 
             alignment.mult(ALIGN)
             cohesion.mult(COHESION)
             separation.mult(SEPARATION)
+            avoidance.mult(AVOIDANCE)
 
             acc.add(alignment)
             acc.add(cohesion)
             acc.add(separation)
+            acc.add(avoidance)
         }
 
         private fun averageNeighbours(
@@ -201,7 +227,7 @@ class Program: PApplet() {
             Boid()
         }
         obstacles = listOf(
-//            PVector(width.toFloat()/3, height.toFloat()/2) to PVector(width.toFloat()/4, 100f)
+//            PVector(width.toFloat()/3, height.toFloat()/2) to 100f
         )
     }
 
@@ -213,7 +239,7 @@ class Program: PApplet() {
             boid.show()
         }
         for(obs in obstacles){
-            rect(obs.first.x, obs.first.y, obs.second.x, obs.second.y)
+            ellipse(obs.first.x, obs.first.y, obs.second, obs.second)
         }
     }
 

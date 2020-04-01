@@ -29,7 +29,9 @@ class Program: PApplet(){
         override var dna: DNA<PVector> = randomDNA()
 
         private var min: Float = Float.MAX_VALUE
+        private var last: Float = Float.MIN_VALUE
         private var countMin: Int = Int.MAX_VALUE
+        private var distanceParcourue: Float = 0f
 
         private fun applyForce(force: PVector){
             acc.add(force)
@@ -43,6 +45,8 @@ class Program: PApplet(){
                 pos.add(vel)
                 acc.mult(0f)
                 val d = dist(pos.x, pos.y, target.x, target.y)
+                last = d
+                distanceParcourue += vel.mag()
                 if(d < min){
                     countMin = count
                     min = d
@@ -60,6 +64,7 @@ class Program: PApplet(){
                     }
                 }
             }
+
         }
 
         fun show(){
@@ -80,7 +85,17 @@ class Program: PApplet(){
         private fun randomDNA() = DNA(MutableList(DNA_SIZE){PVector.random2D()})
 
         override fun computeFitness(): Float {
-            return if(min > 0) min(1/(min)+if(min < 100) 1/countMin else 0 , 0.1f) else 0.1f
+//            return if(min > 0){
+//                val m = min(1/(min)+if(min < 400) 1/countMin else 0, 0.1f)
+//                if(crashed && min > 100){
+//                    m/10
+//                }
+//                m
+//            } else {
+//                0.1f
+//            }
+            val avg = distanceParcourue/frameCount
+            return avg/(last)
         }
 
         override fun changeDNA(dna: DNA<PVector>): Rocket {
@@ -89,11 +104,7 @@ class Program: PApplet(){
 
         override fun mutate(it: PVector) : PVector  {
             return if(Random.nextFloat() < MUTATION_RATE){
-                if(Random.nextInt(0,2) == 0){
-                    it.copy().rotate(MAX_EPSILON)
-                } else {
-                    it.copy().rotate(-MAX_EPSILON)
-                }
+                PVector.random2D()
             } else {
                 it
             }
