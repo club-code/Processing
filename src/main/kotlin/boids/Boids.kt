@@ -18,6 +18,7 @@ const val RADIUS_COHESION = 200f
 class Program: PApplet() {
 
     private lateinit var boids: Collection<Boid>
+    private lateinit var obstacles: Collection<Pair<PVector,PVector>>
 
     inner class Boid(
         private val pos: PVector = PVector(random(width.toFloat()), random(height.toFloat())),
@@ -92,6 +93,40 @@ class Program: PApplet() {
             )
         }
 
+//        private fun findMostThreateningObstacle(): Pair<PVector, PVector> {
+//            var mostThreatening: Pair<PVector, PVector>? = null
+//
+//            for (obs in obstacles) {
+//                val collision = lineIntersecsCircle(ahead, ahead2, obs)
+//
+//                // "position" is the character's current position
+//                if (collision && (mostThreatening == null || distance(position, obstacle) < distance(position, mostThreatening))) {
+//                    mostThreatening = obstacle;
+//                }
+//            }
+//            return mostThreatening;
+//        }
+
+//        private fun avoidance(): PVector {
+//            ahead = ...; // calculate the ahead vector
+//            ahead2 = ...; // calculate the ahead2 vector
+//
+//            val mostThreatening  = findMostThreateningObstacle()
+//            val avoidance = PVector()
+//
+//            if (mostThreatening != null) {
+//                avoidance.x = ahead.x - mostThreatening.center.x;
+//                avoidance.y = ahead.y - mostThreatening.center.y;
+//
+//                avoidance.normalize();
+//                avoidance.mult(FORCE_MAX);
+//            } else {
+//                avoidance.mult(0)
+//            }
+//
+//            return avoidance;
+//        }
+
         fun flock(){
             val alignment = align()
             val cohesion = cohesion()
@@ -165,6 +200,9 @@ class Program: PApplet() {
         boids = List(SIZE){
             Boid()
         }
+        obstacles = listOf(
+//            PVector(width.toFloat()/3, height.toFloat()/2) to PVector(width.toFloat()/4, 100f)
+        )
     }
 
     override fun draw(){
@@ -173,6 +211,9 @@ class Program: PApplet() {
             boid.flock()
             boid.update()
             boid.show()
+        }
+        for(obs in obstacles){
+            rect(obs.first.x, obs.first.y, obs.second.x, obs.second.y)
         }
     }
 
