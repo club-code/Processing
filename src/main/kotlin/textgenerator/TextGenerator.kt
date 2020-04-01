@@ -107,7 +107,7 @@ fun <T> lsh(array: Array<T>, input: T){
 fun stringToInt(str: String, default:Int)= if(str == "") default else str.toInt()
 
 
-fun main(){
+fun main(args: Array<String>){
     val file = File("sample.txt")
     val fileContent=
         if(file.exists())

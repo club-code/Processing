@@ -80,7 +80,7 @@ class Program: PApplet(){
         private fun randomDNA() = DNA(MutableList(DNA_SIZE){PVector.random2D()})
 
         override fun computeFitness(): Float {
-            return if(min > 0) min(1/(min)+if(min < 100) 1/countMin else 0 , 1f) else 1f
+            return if(min > 0) min(1/(min)+if(min < 100) 1/countMin else 0 , 0.1f) else 0.1f
         }
 
         override fun changeDNA(dna: DNA<PVector>): Rocket {
@@ -148,7 +148,7 @@ class Program: PApplet(){
     }
 }
 
-fun main(){
+fun main(args: Array<String>){
     Program().run()
 }
 

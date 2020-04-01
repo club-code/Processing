@@ -195,7 +195,7 @@ class Program : PApplet() {
 }
 
 
-fun main() {
+fun main(args: Array<String>) {
     Program().run()
 }
 
