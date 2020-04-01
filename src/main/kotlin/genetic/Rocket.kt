@@ -8,8 +8,8 @@ import kotlin.random.Random
 const val DNA_SIZE = 200
 const val POP_SIZE = 50
 const val TAR_RADIUS = 20f
-const val MAX_EPSILON = 0.05f
-const val MUTATION_RATE = 0.001f
+var MAX_EPSILON = 0.05f
+const val MUTATION_RATE = 0.002f
 
 class Program: PApplet(){
 
@@ -50,6 +50,7 @@ class Program: PApplet(){
                 if (min < TAR_RADIUS) {
                     min = 0f
                     crashed = true
+                    MAX_EPSILON += 0.001f
                 } else {
                     for(o in obstacles){
                         if(pos.x in o.first.x..o.first.x+o.second.x && pos.y in o.first.y..o.first.y+o.second.y){
@@ -64,16 +65,22 @@ class Program: PApplet(){
         fun show(){
             pushMatrix()
             translate(pos.x, pos.y)
-            rotate(vel.heading())
-            rectMode(PConstants.CENTER)
-            rect(0f,0f, 50f, 10f)
+            rotate(vel.heading() - PI/2)
+
+            beginShape()
+            vertex(0f,0f)
+            vertex(20f, -50f)
+            vertex(0f,-30f)
+            vertex(-20f, -50f)
+            endShape(CLOSE)
+
             popMatrix()
         }
 
         private fun randomDNA() = DNA(MutableList(DNA_SIZE){PVector.random2D()})
 
         override fun computeFitness(): Float {
-            return if(min > 0) min(1/sqrt(min+countMin), 0.2f) else 0.2f
+            return if(min > 0) min(1/(min)+if(min < 100) 1/countMin else 0 , 1f) else 1f
         }
 
         override fun changeDNA(dna: DNA<PVector>): Rocket {
