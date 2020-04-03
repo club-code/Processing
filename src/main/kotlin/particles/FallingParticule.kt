@@ -4,16 +4,15 @@ import processing.core.PApplet
 import processing.event.MouseEvent
 import kotlin.random.Random
 
-const val NB_PARTICLE_WIDTH = 30
-const val NB_PARTICLE_HEIGHT = 16
+const val NB_PARTICLE_WIDTH = 750
+const val NB_PARTICLE_HEIGHT = 400
+const val WIDTH = 2f
 
 enum class Type {
     NOTHING,
     WALL,
-    SAND,
-    WATER;
-
-    fun isMoveable() = this == SAND || this == WATER
+    SAND;
+    fun isMoveable() = this == SAND
 
 }
 
@@ -62,34 +61,10 @@ class Program : PApplet() {
                         particle.swap(particles[i - 1][j - 1], evenFrame)
                     } else if (!evenFrame && i - 1 >= 0 && j + 1 < particles[i].size && particles[i - 1][j + 1].type == Type.NOTHING) {
                         particle.swap(particles[i - 1][j + 1], evenFrame)
-                    } else if (i - 1 >= 0 && particles[i - 1][j].type == Type.WATER) {
-                        particle.swap(particles[i - 1][j], evenFrame)
                     } else {
                         particle.evenLastUpdate = evenFrame
                     }
-                } else if (particle.evenLastUpdate != evenFrame && particle.type == Type.WATER) {
-                    if (i - 1 >= 0 && particles[i - 1][j].type == Type.NOTHING) {
-                        particle.swap(particles[i - 1][j], evenFrame)
-                    } else if (i - 1 >= 0 && particles[i - 1][j].type == Type.WATER) {
-                        val left = j - 1 >= 0 && particles[i][j - 1].type == Type.NOTHING &&
-                                particles[i][j - 1].evenLastUpdate != evenFrame
-                        val right = j + 1 < particles[i].size && particles[i][j + 1].type == Type.NOTHING &&
-                                particles[i][j + 1].evenLastUpdate != evenFrame
-                        if (left && right) {
-                            val isLeft = Random.nextBoolean()
-                            if (isLeft)
-                                particle.swap(particles[i][j - 1], evenFrame)
-                            else
-                                particle.swap(particles[i][j + 1], evenFrame)
-                        } else if (left) {
-                            particle.swap(particles[i][j - 1], evenFrame)
-                        } else if (right) {
-                            particle.swap(particles[i][j + 1], evenFrame)
-                        } else {
-                            particle.evenLastUpdate = evenFrame
-                        }
-                    }
-                } else if (particle.type.isMoveable()) {
+                }else if (particle.type.isMoveable()) {
                     particle.evenLastUpdate = evenFrame
                 }
 
@@ -100,13 +75,10 @@ class Program : PApplet() {
             for ((j, particle) in particleLine.withIndex()) {
                 when (particle.type) {
                     Type.WALL -> {
-                        fill(100f);rect(j * 50f, height - (i + 1) * 50f, 50f, 50f)
+                        fill(100f);rect(j * WIDTH, height - (i + 1) * WIDTH, WIDTH, WIDTH)
                     }
                     Type.SAND -> {
-                        fill(178f, 110f, 51f);rect(j * 50f, height - (i + 1) * 50f, 50f, 50f)
-                    }
-                    Type.WATER -> {
-                        fill(51f, 119f, 178f);rect(j * 50f, height - (i + 1) * 50f, 50f, 50f)
+                        fill(178f, 110f, 51f);rect(j * WIDTH, height - (i + 1) * WIDTH, WIDTH, WIDTH)
                     }
                     Type.NOTHING -> {
                     }
@@ -117,8 +89,8 @@ class Program : PApplet() {
 
     override fun mouseClicked(event: MouseEvent?) {
         if (event != null) {
-            val i = (height - event.y) / 50
-            val j = (event.x) / 50
+            val i = (height - event.y) / WIDTH.toInt()
+            val j = (event.x) / WIDTH.toInt()
             val evenFrame = frameCount % 2 == 0
             if (event.button == LEFT) {
                 if (i in particles.indices && j in particles[i].indices && particles[i][j].type == Type.NOTHING) {
@@ -126,8 +98,8 @@ class Program : PApplet() {
                     particles[i][j].evenLastUpdate = evenFrame
                 }
             } else if (event.button == RIGHT) {
-                if (i in particles.indices && j in particles[i].indices && particles[i][j].type == Type.NOTHING) {
-                    particles[i][j].type = Type.WATER
+                if (i in particles.indices && j in particles[i].indices && particles[i][j].type == Type.SAND) {
+                    particles[i][j].type = Type.NOTHING
                     particles[i][j].evenLastUpdate = evenFrame
                 }
             }
