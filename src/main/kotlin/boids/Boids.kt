@@ -21,16 +21,16 @@ const val RADIUS_ALIGN = 150f
 const val RADIUS_COHESION = 200f
 const val RADIUS_AVOIDANCE = 400f
 
-class Program: PApplet() {
+class Program : PApplet() {
 
     private lateinit var boids: Collection<Boid>
-    private lateinit var obstacles: Collection<Pair<PVector,Float>>
+    private lateinit var obstacles: Collection<Pair<PVector, Float>>
 
     inner class Boid(
         private val pos: PVector = PVector(random(width.toFloat()), random(height.toFloat())),
         private val vel: PVector = PVector.random2D(),
         private val acc: PVector = PVector()
-    ){
+    ) {
         private fun edges() {
             if (pos.x > width) {
                 pos.x = 0f
@@ -44,7 +44,7 @@ class Program: PApplet() {
             }
         }
 
-        private fun align(): PVector{
+        private fun align(): PVector {
             return averageNeighbours(
                 RADIUS_ALIGN,
                 { steering, other, _ ->
@@ -53,7 +53,7 @@ class Program: PApplet() {
                 { steering, total ->
                     if (total > 0) {
                         steering.div(total)
-                        steering.setMag(SPEED_MAX*MASS)
+                        steering.setMag(SPEED_MAX * MASS)
                         steering.sub(vel)
                         steering.limit(FORCE_MAX)
                     }
@@ -62,7 +62,7 @@ class Program: PApplet() {
         }
 
 
-        private fun separation(): PVector{
+        private fun separation(): PVector {
             return averageNeighbours(
                 RADIUS_SEPARATION,
                 { steering, other, d ->
@@ -73,7 +73,7 @@ class Program: PApplet() {
                 { steering, total ->
                     if (total > 0) {
                         steering.div(total)
-                        steering.setMag(SPEED_MAX*MASS)
+                        steering.setMag(SPEED_MAX * MASS)
                         steering.sub(vel)
                         steering.limit(FORCE_MAX)
                     }
@@ -81,7 +81,7 @@ class Program: PApplet() {
             )
         }
 
-        private fun cohesion(): PVector{
+        private fun cohesion(): PVector {
             return averageNeighbours(
                 RADIUS_COHESION,
                 { steering, other, _ ->
@@ -91,7 +91,7 @@ class Program: PApplet() {
                     if (total > 0) {
                         steering.div(total)
                         steering.sub(pos)
-                        steering.setMag(SPEED_MAX*MASS)
+                        steering.setMag(SPEED_MAX * MASS)
                         steering.sub(vel)
                         steering.limit(FORCE_MAX)
                     }
@@ -99,12 +99,12 @@ class Program: PApplet() {
             )
         }
 
-        private fun lineIntersecsCircle(start: PVector, end: PVector, center: PVector, radius: Float): Boolean{
-            val endX = end.x-center.x
-            val startX = start.x-center.x
-            val endY = end.y-center.y
-            val startY = start.y-center.y
-            return radius.pow(2)*((endX-startX).pow(2)+(endY-startY).pow(2))-(startX*endY-endX*startY) >= 0
+        private fun lineIntersecsCircle(start: PVector, end: PVector, center: PVector, radius: Float): Boolean {
+            val endX = end.x - center.x
+            val startX = start.x - center.x
+            val endY = end.y - center.y
+            val startY = start.y - center.y
+            return radius.pow(2) * ((endX - startX).pow(2) + (endY - startY).pow(2)) - (startX * endY - endX * startY) >= 0
         }
 
         private fun findMostThreateningObstacle(ahead: PVector): Pair<PVector, Float>? {
@@ -116,7 +116,8 @@ class Program: PApplet() {
                 // "position" is the character's current position
                 if (collision && (mostThreatening == null ||
                             distanceFlatTorus(pos.x, pos.y, obs.first.x, obs.first.y) <
-                                distanceFlatTorus(pos.x, pos.y, mostThreatening.first.x, mostThreatening.first.y))) {
+                            distanceFlatTorus(pos.x, pos.y, mostThreatening.first.x, mostThreatening.first.y))
+                ) {
                     mostThreatening = obs
                 }
             }
@@ -126,18 +127,18 @@ class Program: PApplet() {
         private fun avoidance(): PVector {
             val ahead = PVector.add(pos, PVector.mult(vel, 3f))
 
-            val mostThreatening  = findMostThreateningObstacle(ahead)
+            val mostThreatening = findMostThreateningObstacle(ahead)
             val avoidance = PVector()
 
             if (mostThreatening != null) {
                 val d = distanceFlatTorus(pos.x, pos.y, mostThreatening.first.x, mostThreatening.first.y)
-                if(d < RADIUS_AVOIDANCE) {
+                if (d < RADIUS_AVOIDANCE) {
                     avoidance.x = ahead.x - mostThreatening.first.x
                     avoidance.y = ahead.y - mostThreatening.first.y
                     //val mag = avoidance.mag()
                     avoidance.normalize()
                     avoidance.mult(FORCE_MAX)
-                    if(d < mostThreatening.second){
+                    if (d < mostThreatening.second) {
                         avoidance.mult(2f)
                     }
                 } else {
@@ -150,7 +151,7 @@ class Program: PApplet() {
             return avoidance
         }
 
-        fun flock(){
+        fun flock() {
             val alignment = align()
             val cohesion = cohesion()
             val separation = separation()
@@ -170,8 +171,8 @@ class Program: PApplet() {
         private fun averageNeighbours(
             radius: Float,
             operation: (PVector, Boid, Float) -> Unit,
-            steeringOp: (PVector, Float)-> Unit
-        ): PVector{
+            steeringOp: (PVector, Float) -> Unit
+        ): PVector {
             val steering = PVector()
             var total = 0f
             for (other in boids) {
@@ -187,7 +188,7 @@ class Program: PApplet() {
             return steering
         }
 
-        fun update(){
+        fun update() {
             pos.add(vel)
             vel.add(acc)
             vel.limit(SPEED_MAX)
@@ -195,15 +196,15 @@ class Program: PApplet() {
             edges()
         }
 
-        fun show(){
+        fun show() {
             pushMatrix()
             translate(pos.x, pos.y)
-            rotate(vel.heading() - PI/2)
+            rotate(vel.heading() - PI / 2)
 
             beginShape()
-            vertex(0f,0f)
+            vertex(0f, 0f)
             vertex(20f, -50f)
-            vertex(0f,-30f)
+            vertex(0f, -30f)
             vertex(-20f, -50f)
             endShape(CLOSE)
 
@@ -215,15 +216,15 @@ class Program: PApplet() {
          * @link https://www.researchgate.net/publication/327930363_Packing_of_Circles_on_Square_Flat_Torus_as_Global_Optimization_of_Mixed_Integer_Nonlinear_problem#pf1
          */
         private fun distanceFlatTorus(x1: Float, y1: Float, x2: Float, y2: Float): Float =
-            sqrt(pow(min(abs(x1-x2), width-abs(x1-x2)), 2f) + pow(min(abs(y1-y2), height-abs(y1-y2)), 2f))
+            sqrt(pow(min(abs(x1 - x2), width - abs(x1 - x2)), 2f) + pow(min(abs(y1 - y2), height - abs(y1 - y2)), 2f))
     }
 
-    override fun settings(){
-        size(1500,800)
+    override fun settings() {
+        size(1500, 800)
     }
 
-    override fun setup(){
-        boids = List(SIZE){
+    override fun setup() {
+        boids = List(SIZE) {
             Boid()
         }
         obstacles = listOf(
@@ -231,24 +232,24 @@ class Program: PApplet() {
         )
     }
 
-    override fun draw(){
+    override fun draw() {
         background(0)
-        for(boid in boids){
+        for (boid in boids) {
             boid.flock()
             boid.update()
             boid.show()
         }
-        for(obs in obstacles){
+        for (obs in obstacles) {
             ellipse(obs.first.x, obs.first.y, obs.second, obs.second)
         }
     }
 
-    fun run(){
+    fun run() {
         runSketch()
     }
 }
 
-fun main(args: Array<String>){
+fun main(args: Array<String>) {
     Program().run()
 }
 

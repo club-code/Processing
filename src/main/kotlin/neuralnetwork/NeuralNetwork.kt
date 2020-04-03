@@ -7,13 +7,15 @@ import scientifik.kmath.structures.Matrix
 import scientifik.kmath.structures.as2D
 import scientifik.kmath.structures.mapToBuffer
 
-fun main(){
+fun main() {
     val nn = createNeuralNetwork {
         inputLayer(3)
         hiddenLayer(3)
         outputLayer(3)
     }
+    println(nn)
     nn.compute()
+    println(nn)
 }
 
 fun createNeuralNetwork(op: NeuralNetworkBuilder.() -> Unit): NeuralNetwork {
@@ -35,8 +37,8 @@ class NeuralNetwork(
         .map {
             CalculatedLayer(it)
         }.also { layers ->
-            layers.withIndex().forEach { (i,layer) ->
-                layer.feedingLayer = (if (i == 0) inputLayer else layers[i-1])
+            layers.withIndex().forEach { (i, layer) ->
+                layer.feedingLayer = (if (i == 0) inputLayer else layers[i - 1])
             }
         }
 
@@ -54,9 +56,10 @@ class NeuralNetwork(
         outputLayer.compute()
     }
 
-    val weightMatrices get() = hiddenLayers.asSequence().map { it.weightsMatrix }
-        .plusElement(outputLayer.weightsMatrix)
-        .toList()
+    val weightMatrices
+        get() = hiddenLayers.asSequence().map { it.weightsMatrix }
+            .plusElement(outputLayer.weightsMatrix)
+            .toList()
 
     val calculatedLayers = hiddenLayers.plusElement(outputLayer)
 
@@ -76,9 +79,9 @@ class NeuralNetwork(
         (0..10000).asSequence().takeWhile { lowestError > 0 }.forEach {
             randomize()
 
-            val totalError = entries.asSequence().map { (input,target) ->
+            val totalError = entries.asSequence().map { (input, target) ->
 
-                inputLayer.withIndex().forEach { (i,layer) -> layer.value = input[i]  }
+                inputLayer.withIndex().forEach { (i, layer) -> layer.value = input[i] }
                 compute()
 
 
@@ -105,7 +108,7 @@ class NeuralNetwork(
 
 
         // assign input values to input nodes
-        inputValues.withIndex().forEach { (i,v) -> inputLayer.nodes[i].value = v }
+        inputValues.withIndex().forEach { (i, v) -> inputLayer.nodes[i].value = v }
 
         // calculate new hidden and output node values
         compute()
@@ -114,23 +117,22 @@ class NeuralNetwork(
 
     override fun toString(): String {
         val sb = StringBuilder()
-        sb.append(inputLayer.toString()+"\n")
-        sb.append(hiddenLayers.toString()+"\n")
-        sb.append(outputLayer.toString()+"\n")
+        sb.append(inputLayer.toString() + "\n")
+        sb.append(hiddenLayers.toString() + "\n")
+        sb.append(outputLayer.toString() + "\n")
         return sb.toString()
     }
 }
 
 
-
 // LAYERS
-sealed class Layer<N: Node>: Iterable<N> {
+sealed class Layer<N : Node> : Iterable<N> {
     abstract val nodes: List<N>
     override fun iterator() = nodes.iterator()
 
     override fun toString(): String {
         val sb = StringBuilder()
-        for(node in nodes){
+        for (node in nodes) {
             sb.append("$node ")
         }
         return sb.toString()
@@ -140,7 +142,7 @@ sealed class Layer<N: Node>: Iterable<N> {
 /**
  * An `neuralnetwork.InputLayer` belongs to the first layer and accepts the input values for each `neuralnetwork.InputNode`
  */
-class InputLayer(nodeCount: Int): Layer<InputNode>() {
+class InputLayer(nodeCount: Int) : Layer<InputNode>() {
 
     override val nodes = (0 until nodeCount).asSequence()
         .map { InputNode(it) }
@@ -150,7 +152,7 @@ class InputLayer(nodeCount: Int): Layer<InputNode>() {
 /**
  * A `neuralnetwork.CalculatedLayer` is used for the hidden and output layers, and is derived off weights and values off each previous layer
  */
-class CalculatedLayer(nodeCount: Int): Layer<CalculatedNode>() {
+class CalculatedLayer(nodeCount: Int) : Layer<CalculatedNode>() {
 
     lateinit var feedingLayer: Layer<out Node>
 
@@ -160,17 +162,17 @@ class CalculatedLayer(nodeCount: Int): Layer<CalculatedNode>() {
             .toList()
     }
 
-    var weightsMatrix = Matrix.real(nodeCount,1){ _, _ -> 0.0}
-    var valuesMatrix = Matrix.real(nodeCount,1){ _, _ -> 0.0}
+    var weightsMatrix = Matrix.real(nodeCount, 1) { _, _ -> 0.0 }
+    var valuesMatrix = Matrix.real(nodeCount, 1) { _, _ -> 0.0 }
 
     fun randomizeWeights() {
-        weightsMatrix = Matrix.real(count(), feedingLayer.count()) { _,_ ->
+        weightsMatrix = Matrix.real(count(), feedingLayer.count()) { _, _ ->
             randomInitialValue()
         }
     }
 
     fun compute() {
-        valuesMatrix = ( weightsMatrix dot (feedingLayer.toMatrix({it.value})) ).mapToBuffer {
+        valuesMatrix = (weightsMatrix dot (feedingLayer.toMatrix({ it.value }))).mapToBuffer {
             sigmoid(it)
         }.as2D()
     }
@@ -187,21 +189,22 @@ sealed class Node(val index: Int) {
 }
 
 
-class InputNode(index: Int): Node(index) {
+class InputNode(index: Int) : Node(index) {
     override var value = randomInitialValue()
 }
 
 
-class CalculatedNode(index: Int,
-                     val parentLayer: CalculatedLayer
-): Node(index) {
+class CalculatedNode(
+    index: Int,
+    val parentLayer: CalculatedLayer
+) : Node(index) {
 
     override val value: Double
-        get() = parentLayer.valuesMatrix[index,0]
+        get() = parentLayer.valuesMatrix[index, 0]
 
 }
 
-fun randomInitialValue() = ThreadLocalRandom.current().nextDouble(-1.0,1.0)
+fun randomInitialValue() = ThreadLocalRandom.current().nextDouble(-1.0, 1.0)
 fun sigmoid(x: Number) = 1.0 / (1.0 + exp(-x.toDouble()))
 
 // BUILDERS

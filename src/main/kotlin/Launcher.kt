@@ -6,7 +6,7 @@ import randomsierpinski.main as randomsierpinskiMain
 import genetic.main as geneticMain
 import textgenerator.main as textgeneratorMain
 
-fun main(args: Array<String>){
+fun main(args: Array<String>) {
     val projects = listOf(
         "Boids" to ::boidsMain,
         "CherryTree" to ::cherrytreeMain,
@@ -17,17 +17,17 @@ fun main(args: Array<String>){
         "TextGenerator" to ::textgeneratorMain
     )
     var found = false
-    while(!found) {
+    while (!found) {
 
-        for((index, value) in projects.withIndex()){
-            println("${value.first}: ${index+1}")
+        for ((index, value) in projects.withIndex()) {
+            println("${value.first}: ${index + 1}")
         }
         val a = readLine()
         if (a != null) {
             found = true
             val x = a.toInt()
-            if(x-1 in projects.indices){
-                projects[x-1].second.invoke(args)
+            if (x - 1 in projects.indices) {
+                projects[x - 1].second.invoke(args)
             }
         }
     }

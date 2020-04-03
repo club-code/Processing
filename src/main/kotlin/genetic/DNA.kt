@@ -9,7 +9,7 @@ data class DNA<T>(val genes: MutableList<T> = ArrayList()) {
         val mid = Random.nextInt(0, genes.size)
         return DNA(
             genes.mapIndexed { index, t ->
-                if(index > mid){
+                if (index > mid) {
                     t
                 } else {
                     partner.genes[index]
@@ -18,7 +18,7 @@ data class DNA<T>(val genes: MutableList<T> = ArrayList()) {
         )
     }
 
-    fun mutate(mutate: (T)-> T): DNA<T> {
+    fun mutate(mutate: (T) -> T): DNA<T> {
         return DNA(
             genes.map {
                 mutate(it)

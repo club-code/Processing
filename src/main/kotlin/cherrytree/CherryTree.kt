@@ -48,12 +48,13 @@ const val INIT_MAX_ORIENTATION_MIN = 30f
 const val INIT_MAX_ORIENTATION_MAX = 50f
 
 
-
 class Program : PApplet() {
     lateinit var root: Tree
 
-    inner class Tree(private val truncLength: Float,            private val truncWidth: Float,
-                     private val orientationDifference: Float,  private val orientationMax: Float) {
+    inner class Tree(
+        private val truncLength: Float, private val truncWidth: Float,
+        private val orientationDifference: Float, private val orientationMax: Float
+    ) {
         private var left: Tree? = null
         private var right: Tree? = null
         private val trunc = Trunc(this.truncLength, this.truncWidth, this.orientationDifference)
@@ -116,8 +117,16 @@ class Program : PApplet() {
 
             while (sum < this.length) {
                 val l = random(TRUNC_STEP_LENGTH_MIN, TRUNC_STEP_LENGTH_MAX)
-                this.truncSteps.add(TruncStep(l, this.width, radians(random(TRUNC_STEP_ORIENTATION_DIFF_MIN,
-                                                                            TRUNC_STEP_ORIENTATION_DIFF_MAX))))
+                this.truncSteps.add(
+                    TruncStep(
+                        l, this.width, radians(
+                            random(
+                                TRUNC_STEP_ORIENTATION_DIFF_MIN,
+                                TRUNC_STEP_ORIENTATION_DIFF_MAX
+                            )
+                        )
+                    )
+                )
                 sum += l
             }
         }
@@ -129,7 +138,7 @@ class Program : PApplet() {
         fun draw(t: Int, position: PVector, orientation: Float): Pair<PVector, Float> {
             var end: PVector = position
             var stepOrientation = (orientation + this.orientationDifference
-                                   + this.oscillationAmplitude * sin(this.frequency * t + this.phase))
+                    + this.oscillationAmplitude * sin(this.frequency * t + this.phase))
 
             for (step in this.truncSteps) {
                 val pair = step.draw(end, stepOrientation)
@@ -142,11 +151,15 @@ class Program : PApplet() {
     }
 
 
-    inner class TruncStep(private val length: Float, private val width: Float, private val orientationDifference: Float) {
+    inner class TruncStep(
+        private val length: Float,
+        private val width: Float,
+        private val orientationDifference: Float
+    ) {
         fun draw(position: PVector, orientation: Float): Pair<PVector, Float> {
             val newOrientation = orientation + this.orientationDifference
             val end = PVector.add(position, PVector.fromAngle(newOrientation).mult(this.length))
- 
+
             strokeWeight(this.width)
             line(position.x, position.y, end.x, end.y)
 
@@ -172,14 +185,28 @@ class Program : PApplet() {
     }
 
     override fun mouseClicked() {
-        this.root = Tree(random(INIT_TRUNC_LENGTH_MIN,
-                                INIT_TRUNC_LENGTH_MAX),
-                         random(INIT_TRUNC_WIDTH_MIN,
-                                INIT_TRUNC_WIDTH_MAX),
-                         radians(random(INIT_ORIENTATION_DIFF_MIN,
-                                        INIT_ORIENTATION_DIFF_MAX)),
-                         radians(random(INIT_MAX_ORIENTATION_MIN,
-                                        INIT_MAX_ORIENTATION_MAX)))
+        this.root = Tree(
+            random(
+                INIT_TRUNC_LENGTH_MIN,
+                INIT_TRUNC_LENGTH_MAX
+            ),
+            random(
+                INIT_TRUNC_WIDTH_MIN,
+                INIT_TRUNC_WIDTH_MAX
+            ),
+            radians(
+                random(
+                    INIT_ORIENTATION_DIFF_MIN,
+                    INIT_ORIENTATION_DIFF_MAX
+                )
+            ),
+            radians(
+                random(
+                    INIT_MAX_ORIENTATION_MIN,
+                    INIT_MAX_ORIENTATION_MAX
+                )
+            )
+        )
         this.root.noBaseOscillation()
     }
 

@@ -2,7 +2,7 @@ package genetic
 
 import kotlin.random.Random
 
-interface Evolutionable<M: Evolutionable<M, T>, T> {
+interface Evolutionable<M : Evolutionable<M, T>, T> {
     val dna: DNA<T>
 
     fun computeFitness(): Float
@@ -12,19 +12,19 @@ interface Evolutionable<M: Evolutionable<M, T>, T> {
 
 const val MAT_COUNT = 20
 
-class Population<M, T: Evolutionable<T, M>>(var list: MutableList<T> = ArrayList()){
+class Population<M, T : Evolutionable<T, M>>(var list: MutableList<T> = ArrayList()) {
     private val matingPool = mutableListOf<T>()
 
-    fun evaluate(){
+    fun evaluate() {
         val fitness = list.map { it.computeFitness() }
         val max = fitness.maxBy {
             it
         }
-        if(max != null) {
+        if (max != null) {
             val normalizedFitness = fitness.map { it / max }
-            for((i, value) in normalizedFitness.withIndex()){
+            for ((i, value) in normalizedFitness.withIndex()) {
                 val n = (value * MAT_COUNT).toInt()
-                for(x in 0 until n){
+                for (x in 0 until n) {
                     matingPool.add(list[i])
                 }
             }
@@ -33,7 +33,7 @@ class Population<M, T: Evolutionable<T, M>>(var list: MutableList<T> = ArrayList
         matingPool.clear()
     }
 
-    private fun selection(){
+    private fun selection() {
         list = list.map {
             val parentA = matingPool[Random.nextInt(0, matingPool.size)].dna
             val parentB = matingPool[Random.nextInt(0, matingPool.size)].dna

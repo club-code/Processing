@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
 
 
-
 import processing.core.PApplet
 import processing.core.PVector
 import java.util.concurrent.ArrayBlockingQueue
@@ -20,14 +19,14 @@ class Program : PApplet() {
 
     lateinit var triangle: Triangle
 
-    class Triangle(val point1:  PVector, val point2: PVector, val point3: PVector)
+    class Triangle(val point1: PVector, val point2: PVector, val point3: PVector)
 
-    fun generatePoints(start: PVector, count: Int): PVector{
+    fun generatePoints(start: PVector, count: Int): PVector {
         var current = start
-        repeat(count){
-            current = when(random(1f)){
-                in 0f..(1f/3) -> PVector.mult(PVector.add(current, triangle.point1), 0.5f)
-                in (1f/3)..(2f/3) -> PVector.mult(PVector.add(current, triangle.point2), 0.5f)
+        repeat(count) {
+            current = when (random(1f)) {
+                in 0f..(1f / 3) -> PVector.mult(PVector.add(current, triangle.point1), 0.5f)
+                in (1f / 3)..(2f / 3) -> PVector.mult(PVector.add(current, triangle.point2), 0.5f)
                 else -> PVector.mult(PVector.add(current, triangle.point3), 0.5f)
             }
             points.put(current)
@@ -35,32 +34,32 @@ class Program : PApplet() {
         return current
     }
 
-    override fun settings(){
+    override fun settings() {
         size(1500, 800)
 
     }
 
-    override fun setup(){
+    override fun setup() {
         mouseClicked()
     }
 
     override fun mouseClicked() {
         job?.cancel()
         points.clear()
-        triangle = Triangle (
-            PVector(random(1500f),random( 800f)),
-            PVector(random(1500f),random( 800f)),
-            PVector(random(1500f),random( 800f))
+        triangle = Triangle(
+            PVector(random(1500f), random(800f)),
+            PVector(random(1500f), random(800f)),
+            PVector(random(1500f), random(800f))
         )
         val alpha = random(1f)
         val beta = random(1f)
-        val point1 = PVector.add(PVector.mult(triangle.point1, alpha),PVector.mult(triangle.point2, 1-alpha))
-        start = PVector.add(PVector.mult(point1, beta), PVector.mult(triangle.point3, 1-beta))
+        val point1 = PVector.add(PVector.mult(triangle.point1, alpha), PVector.mult(triangle.point2, 1 - alpha))
+        start = PVector.add(PVector.mult(point1, beta), PVector.mult(triangle.point3, 1 - beta))
 
 
 
         job = GlobalScope.launch {
-            while(true){
+            while (true) {
                 start = generatePoints(start, count)
             }
         }
@@ -75,12 +74,12 @@ class Program : PApplet() {
     }
 
 
-    fun run(){
+    fun run() {
         runSketch()
     }
 }
 
-fun main(args: Array<String>){
+fun main(args: Array<String>) {
     Program().run()
 }
 
