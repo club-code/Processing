@@ -1,7 +1,6 @@
 plugins {
     java
     kotlin("jvm") version "1.3.61"
-    application
 }
 
 group = "org.example"
@@ -24,10 +23,6 @@ configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
-application {
-    mainClassName = "LauncherKt"
-}
-
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
@@ -35,11 +30,18 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
+
     jar {
         manifest {
             attributes("Main-Class" to "LauncherKt")
         }
         from(Callable { configurations["runtimeClasspath"].map { if (it.isDirectory) it else zipTree(it) } })
+    }
+
+    register("run", JavaExec::class) {
+        main = "LauncherKt"
+        standardInput = System.`in`
+        classpath = sourceSets["main"].runtimeClasspath
     }
 }
 
