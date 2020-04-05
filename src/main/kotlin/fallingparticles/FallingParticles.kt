@@ -1,8 +1,7 @@
-package particles
+package fallingparticles
 
 import processing.core.PApplet
 import processing.event.MouseEvent
-import kotlin.random.Random
 
 const val NB_PARTICLE_WIDTH = 750
 const val NB_PARTICLE_HEIGHT = 400
@@ -12,6 +11,7 @@ enum class Type {
     NOTHING,
     WALL,
     SAND;
+
     fun isMoveable() = this == SAND
 
 }
@@ -32,7 +32,8 @@ class Program : PApplet() {
     private fun setType(startX: Int, startY: Int, endX: Int, endY: Int, type: Type, evenLastUpdate: Boolean = false) {
         for (i in startY..endY) {
             for (j in startX..endX) {
-                particles[i][j] = Particle(type, evenLastUpdate)
+                if (i in 0 until NB_PARTICLE_HEIGHT && j in 0 until NB_PARTICLE_WIDTH)
+                    particles[i][j] = Particle(type, evenLastUpdate)
             }
         }
     }
@@ -64,7 +65,7 @@ class Program : PApplet() {
                     } else {
                         particle.evenLastUpdate = evenFrame
                     }
-                }else if (particle.type.isMoveable()) {
+                } else if (particle.type.isMoveable()) {
                     particle.evenLastUpdate = evenFrame
                 }
 
@@ -93,10 +94,11 @@ class Program : PApplet() {
             val j = (event.x) / WIDTH.toInt()
             val evenFrame = frameCount % 2 == 0
             if (event.button == LEFT) {
-                if (i in particles.indices && j in particles[i].indices && particles[i][j].type == Type.NOTHING) {
-                    particles[i][j].type = Type.SAND
-                    particles[i][j].evenLastUpdate = evenFrame
-                }
+                setType(j - 10, i - 10, j + 10, i + 10, Type.SAND, evenFrame)
+//                if (i in particles.indices && j in particles[i].indices && particles[i][j].type == Type.NOTHING) {
+//                    particles[i][j].type = Type.SAND
+//                    particles[i][j].evenLastUpdate = evenFrame
+//                }
             } else if (event.button == RIGHT) {
                 if (i in particles.indices && j in particles[i].indices && particles[i][j].type == Type.SAND) {
                     particles[i][j].type = Type.NOTHING
