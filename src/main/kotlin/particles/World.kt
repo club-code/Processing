@@ -4,7 +4,7 @@ import processing.core.PApplet
 import processing.event.KeyEvent
 import processing.event.MouseEvent
 
-const val WIDTH = 50f
+const val WIDTH = 10f
 
 class Program : PApplet() {
 
@@ -42,7 +42,7 @@ class Program : PApplet() {
 
         override fun show(x: Float, y: Float) {
             fill(0f, 0f, 200f)
-            rect(x, y + WIDTH, WIDTH, -size * 50f)
+            rect(x, y + WIDTH, WIDTH, -size * WIDTH)
         }
 
     }
@@ -52,7 +52,7 @@ class Program : PApplet() {
     }
 
     override fun setup() {
-        grid = Grid(30, 16)
+        grid = Grid(width/ WIDTH.toInt(), height/ WIDTH.toInt())
         systems = arrayOf(
             GravitySystem(),
             GranularSystem(),
