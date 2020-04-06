@@ -7,33 +7,45 @@ import genetic.main as geneticMain
 import textgenerator.main as textgeneratorMain
 import fallingparticles.main as fallingparticlesMain
 
+val PROJECTS = listOf(
+    "Boids" to ::boidsMain,
+    "CherryTree" to ::cherrytreeMain,
+    "CirclePacking" to ::circlepackingMain,
+    "SquarePi" to ::piMain,
+    "RandomSierpinski" to ::randomsierpinskiMain,
+    "Rocket" to ::geneticMain,
+    "TextGenerator" to ::textgeneratorMain,
+    "FallingParticles" to ::fallingparticlesMain
+)
+
 
 fun main(args: Array<String>) {
-    val projects = listOf(
-        "Boids" to ::boidsMain,
-        "CherryTree" to ::cherrytreeMain,
-        "CirclePacking" to ::circlepackingMain,
-        "SquarePi" to ::piMain,
-        "RandomSierpinski" to ::randomsierpinskiMain,
-        "Rocket" to ::geneticMain,
-        "TextGenerator" to ::textgeneratorMain,
-        "FallingParticles" to ::fallingparticlesMain
-    )
-    var found = false
+    println("Available projects:")
 
-    while (!found) {
-        for ((index, value) in projects.withIndex()) {
-            println("${value.first}: ${index + 1}")
-        }
+    for ((index, value) in PROJECTS.withIndex()) {
+        println("\t${index + 1}: ${value.first}")
+    }
 
-        val a = readLine()
+    println("\nWhat project would you like to launch?")
 
-        if (a != null) {
-            found = true
-            val x = a.toInt()
+    while (true) {
+        print("\tChoice > ")
+        val line = readLine()
 
-            if (x - 1 in projects.indices) {
-                projects[x - 1].second.invoke(args)
+        if (line != null) {
+            var id: Int
+
+            try {
+                id = line.toInt()
+            } catch(exc: NumberFormatException) {
+                continue
+            }
+
+            if (id - 1 in PROJECTS.indices) {
+                println("\nLaunching...")
+                PROJECTS[id - 1].second.invoke(args)
+                println("Done.")
+                break
             }
         }
     }
