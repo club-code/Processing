@@ -1,4 +1,4 @@
-package particles
+package sandbox
 
 typealias Cells = Array<Array<Cell>>
 

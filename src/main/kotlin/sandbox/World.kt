@@ -1,4 +1,4 @@
-package particles
+package sandbox
 
 import processing.core.PApplet
 import processing.event.KeyEvent
@@ -112,6 +112,9 @@ class Program : PApplet() {
                 }
                 '\'' -> {
                     cell = Iron()
+                }
+                '=' -> {
+                    cell = EmptyCell()
                 }
             }
 

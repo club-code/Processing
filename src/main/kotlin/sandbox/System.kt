@@ -1,4 +1,4 @@
-package particles
+package sandbox
 
 import kotlin.math.max
 import kotlin.math.min

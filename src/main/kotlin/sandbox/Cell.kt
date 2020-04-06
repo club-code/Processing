@@ -1,4 +1,4 @@
-package particles
+package sandbox
 
 const val TOP = 0
 const val RIGHT = 1

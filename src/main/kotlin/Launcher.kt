@@ -6,6 +6,7 @@ import randomsierpinski.main as randomsierpinskiMain
 import genetic.main as geneticMain
 import textgenerator.main as textgeneratorMain
 import fallingparticles.main as fallingparticlesMain
+import sandbox.main as sandboxMain
 
 val PROJECTS = listOf(
     "Boids" to ::boidsMain,
@@ -15,7 +16,8 @@ val PROJECTS = listOf(
     "RandomSierpinski" to ::randomsierpinskiMain,
     "Rocket" to ::geneticMain,
     "TextGenerator" to ::textgeneratorMain,
-    "FallingParticles" to ::fallingparticlesMain
+    "FallingParticles" to ::fallingparticlesMain,
+    "SandBox?" to ::sandboxMain
 )
 
 
