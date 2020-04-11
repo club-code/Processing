@@ -21,13 +21,13 @@ class Program : PApplet() {
             if (width >= 2 * MIN_LENGTH && height >= 2 * MIN_LENGTH) {
                 if(Random.nextFloat() < size.pow(0.2f)) {
                     if(direction < 1f / 2) {
-                        val position = Random.nextFloat() * (width - 2 * MIN_LENGTH) + MIN_LENGTH
+                        val position = (Random.nextFloat() * (width - 2 * MIN_LENGTH) + MIN_LENGTH).toMultiple(MIN_LENGTH)
                         val left = Rectangle(x, y, position, height)
                         val right = Rectangle(x + position, y, width - position, height)
                         left.mondrian()
                         right.mondrian()
                     } else  {
-                        val position = Random.nextFloat() * (height - 2 * MIN_LENGTH) + MIN_LENGTH
+                        val position = (Random.nextFloat() * (height - 2 * MIN_LENGTH) + MIN_LENGTH).toMultiple(MIN_LENGTH)
                         val down = Rectangle(x, y, width, position)
                         val up = Rectangle(x, y + position, width, height - position)
                         down.mondrian()
@@ -39,7 +39,7 @@ class Program : PApplet() {
 
             } else if (width >= 2 * MIN_LENGTH) {
                 if (direction < RANDOM_CONTINUE || width > height * 4) {
-                    val position = Random.nextFloat() * (width - 2 * MIN_LENGTH) + MIN_LENGTH
+                    val position = (Random.nextFloat() * (width - 2 * MIN_LENGTH) + MIN_LENGTH).toMultiple(MIN_LENGTH)
                     val left = Rectangle(x, y, position, height)
                     val right = Rectangle(x + position, y, width- position, height)
                     left.mondrian()
@@ -49,7 +49,7 @@ class Program : PApplet() {
                 }
             } else if (height >= 2 * MIN_LENGTH) {
                 if (direction < RANDOM_CONTINUE || height > width * 4) {
-                    val position = Random.nextFloat() * (height - 2 * MIN_LENGTH) + MIN_LENGTH
+                    val position = (Random.nextFloat() * (height - 2 * MIN_LENGTH) + MIN_LENGTH).toMultiple(MIN_LENGTH)
                     val down = Rectangle(x, y, width, position)
                     val up = Rectangle(x, y + position, width, height - position)
                     down.mondrian()
@@ -76,6 +76,7 @@ class Program : PApplet() {
     }
 
     override fun setup() {
+        strokeWeight(10f)
         colors = listOf(
             PVector(255f, 0f, 0f), PVector(255f, 255f, 0f),
             PVector(0f, 0f, 255f),
@@ -100,4 +101,9 @@ class Program : PApplet() {
 
 fun main(args: Array<String>) {
     Program().run()
+}
+
+fun Float.toMultiple(division: Float): Float{
+    val res = this/division
+    return res.toInt()*division
 }
