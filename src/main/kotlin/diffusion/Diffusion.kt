@@ -1,9 +1,13 @@
 package diffusion
 
 import processing.core.PApplet
+import kotlin.math.pow
 
 const val GRID_WIDTH = 300
 const val GRID_HEIGHT = 160
+
+const val RECT_W = 5
+const val RECT_H = 5
 
 const val CELL_SIZE = 5
 
@@ -104,14 +108,7 @@ class Program : PApplet() {
 
     override fun setup() {
         noStroke()
-        val RECT_W = 10
-        val RECT_H = 10
-        for (i in 0 until RECT_W) {
-            for (j in 0 until RECT_H) {
-                grid.setA(GRID_WIDTH / 2 + i - RECT_W / 2, GRID_HEIGHT / 2 + j - RECT_H / 2, 0f)
-                grid.setB(GRID_WIDTH / 2 + i - RECT_W / 2, GRID_HEIGHT / 2 + j - RECT_H / 2, 1f)
-            }
-        }
+        fillCircle()
     }
 
     override fun draw() {
@@ -139,6 +136,26 @@ class Program : PApplet() {
 
     fun run() {
         runSketch()
+    }
+
+    fun fillRect() {
+        for (i in -RECT_W/2 until RECT_W/2) {
+            for (j in -RECT_H/2 until RECT_H/2) {
+                grid.setA(GRID_WIDTH / 2 + i, GRID_HEIGHT / 2 + j, 0f)
+                grid.setB(GRID_WIDTH / 2 + i, GRID_HEIGHT / 2 + j, 1f)
+            }
+        }
+    }
+
+    private fun fillCircle() {
+        for (i in -RECT_W/2 until RECT_W/2) {
+            for (j in -RECT_H/2 until RECT_H/2) {
+                if((2*i.toFloat()/RECT_W).pow(2f)+(2*j.toFloat()/RECT_H).pow(2f) <= 1){
+                    grid.setA(GRID_WIDTH / 2 + i, GRID_HEIGHT / 2 + j, 0f)
+                    grid.setB(GRID_WIDTH / 2 + i, GRID_HEIGHT / 2 + j, 1f)
+                }
+            }
+        }
     }
 }
 
