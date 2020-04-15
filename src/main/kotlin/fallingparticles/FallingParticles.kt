@@ -3,9 +3,10 @@ package fallingparticles
 import processing.core.PApplet
 import processing.event.MouseEvent
 
-const val NB_PARTICLE_WIDTH = 750
-const val NB_PARTICLE_HEIGHT = 400
-const val WIDTH = 2f
+const val NB_PARTICLE_WIDTH = 75
+const val NB_PARTICLE_HEIGHT = 40
+const val WIDTH = 20f
+const val FILL_SIZE = 0
 
 enum class Type {
     NOTHING,
@@ -43,6 +44,7 @@ class Program : PApplet() {
     }
 
     override fun setup() {
+        frameRate(2f)
         setType(0, 0, 10, 2, Type.WALL)
         setType(4, 3, 6, 3, Type.WALL)
         noStroke()
@@ -94,7 +96,7 @@ class Program : PApplet() {
             val j = (event.x) / WIDTH.toInt()
             val evenFrame = frameCount % 2 == 0
             if (event.button == LEFT) {
-                setType(j - 10, i - 10, j + 10, i + 10, Type.SAND, evenFrame)
+                setType(j - FILL_SIZE, i - FILL_SIZE, j + FILL_SIZE, i + FILL_SIZE, Type.SAND, evenFrame)
 //                if (i in particles.indices && j in particles[i].indices && particles[i][j].type == Type.NOTHING) {
 //                    particles[i][j].type = Type.SAND
 //                    particles[i][j].evenLastUpdate = evenFrame
