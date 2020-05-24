@@ -7,6 +7,8 @@ import genetic.main as geneticMain
 import textgenerator.main as textgeneratorMain
 import fallingparticles.main as fallingparticlesMain
 import sandbox.main as sandboxMain
+import diffusion.main as diffusionMain
+import metaball.main as metaballMain
 
 val PROJECTS = listOf(
     "Boids" to ::boidsMain,
@@ -17,7 +19,9 @@ val PROJECTS = listOf(
     "Rocket" to ::geneticMain,
     "TextGenerator" to ::textgeneratorMain,
     "FallingParticles" to ::fallingparticlesMain,
-    "SandBox?" to ::sandboxMain
+    "SandBox?" to ::sandboxMain,
+    "Diffusion" to ::diffusionMain,
+    "Metaball" to ::metaballMain
 )
 
 
