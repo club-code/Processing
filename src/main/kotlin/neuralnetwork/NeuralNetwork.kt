@@ -2,10 +2,9 @@ package neuralnetwork
 
 import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.*
-import scientifik.kmath.linear.*
-import scientifik.kmath.structures.Matrix
-import scientifik.kmath.structures.as2D
-import scientifik.kmath.structures.mapToBuffer
+import space.kscience.kmath.linear.*
+import space.kscience.kmath.nd.as2D
+import space.kscience.kmath.nd.mapToBuffer
 
 fun main() {
     val nn = createNeuralNetwork {
@@ -163,7 +162,7 @@ class CalculatedLayer(nodeCount: Int) : Layer<CalculatedNode>() {
     }
 
     var weightsMatrix = Matrix.real(nodeCount, 1) { _, _ -> 0.0 }
-    var valuesMatrix = Matrix.real(nodeCount, 1) { _, _ -> 0.0 }
+    var valuesMatrix: Matrix<Double> = Matrix.real(nodeCount, 1) { _, _ -> 0.0 }
 
     fun randomizeWeights() {
         weightsMatrix = Matrix.real(count(), feedingLayer.count()) { _, _ ->
@@ -172,9 +171,11 @@ class CalculatedLayer(nodeCount: Int) : Layer<CalculatedNode>() {
     }
 
     fun compute() {
-        valuesMatrix = (weightsMatrix dot (feedingLayer.toMatrix({ it.value }))).mapToBuffer {
-            sigmoid(it)
-        }.as2D()
+        RealMatrixContext.apply {
+            valuesMatrix = (weightsMatrix dot (feedingLayer.toMatrix({ it.value }))).mapToBuffer {
+                sigmoid(it)
+            }.buffer.asMatrix()
+        }
     }
 }
 

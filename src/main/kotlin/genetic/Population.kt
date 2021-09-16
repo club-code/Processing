@@ -17,7 +17,7 @@ class Population<M, T : Evolutionable<T, M>>(var list: MutableList<T> = ArrayLis
 
     fun evaluate() {
         val fitness = list.map { it.computeFitness() }
-        val max = fitness.maxBy {
+        val max = fitness.maxByOrNull {
             it
         }
         if (max != null) {
