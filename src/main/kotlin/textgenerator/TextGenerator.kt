@@ -27,7 +27,7 @@ class NGram(private val order: Int) {
     }
 
     fun generate(min: Int): String {
-        val current = beginnings.random().clone()
+        val current = beginnings.random().copyOf()
         var size = 1
         val result = StringBuilder()
         var finished = false
